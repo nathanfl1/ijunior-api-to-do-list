@@ -9,8 +9,21 @@ const tasks: Task[] = []
 
 export class TaskService {
 
-    getAll(): Task[] {
-        return tasks;
+    getAll(completed?: string, title?: string): Task[] {
+        let result = tasks;
+
+        if (completed !== undefined) {
+            const isCompleted = completed === "true";
+            result = result.filter(task => task.completed === isCompleted);
+        }
+
+        if (title !== undefined) {
+            result = result.filter(task =>
+                task.title.toLowerCase().includes(title.toLowerCase())
+            );
+        }
+
+        return result;
     }
 
     getById(id: string): Task | undefined {

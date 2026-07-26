@@ -6,7 +6,12 @@ const taskService = new TaskService();
 
 export class TaskController {
     getAll(req: Request, res: Response) {
-        const tasks = taskService.getAll();
+        const { completed, title } = req.query;
+
+        const tasks = taskService.getAll(
+            completed as string | undefined,
+            title as string | undefined
+        );
 
         return res.status(200).json(tasks);
     }
