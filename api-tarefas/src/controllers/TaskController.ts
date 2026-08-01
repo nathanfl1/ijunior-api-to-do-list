@@ -5,10 +5,10 @@ import { TaskService } from "../services/TaskService";
 const taskService = new TaskService();
 
 export class TaskController {
-    getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response) {
         const { completed, title } = req.query;
 
-        const tasks = taskService.getAll(
+        const tasks = await taskService.getAll(
             completed as string | undefined,
             title as string | undefined
         );
@@ -16,10 +16,10 @@ export class TaskController {
         return res.status(200).json(tasks);
     }
 
-    getById(req: Request<{ id: string }>, res: Response) {
-        const { id } = req.params;
+    async getById(req: Request<{ id: number }>, res: Response) {
+        const id = Number(req.params.id);
 
-        const task = taskService.getById(id);
+        const task = await taskService.getById(id);
 
         if (!task) {
             return res.status(404).json({
@@ -30,7 +30,7 @@ export class TaskController {
         return res.status(200).json(task);
     }
 
-    create(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         const { title } = req.body;
 
         if (!title || title.trim() === "") {
@@ -39,16 +39,16 @@ export class TaskController {
             });
         }
 
-        const task = taskService.create(title);
+        const task = await taskService.create(title);
 
         return res.status(201).json(task);
     }
 
-    update(req: Request<{ id: string }>, res: Response) {
-        const { id } = req.params;
+    async update(req: Request<{ id: number }>, res: Response) {
+        const id = Number(req.params.id);
         const { title, completed } = req.body;
 
-        const task = taskService.update(id, title, completed);
+        const task = await taskService.update(id, title, completed);
 
         if (!task) {
             return res.status(404).json({
@@ -59,8 +59,8 @@ export class TaskController {
         return res.status(200).json(task);
     }
 
-    delete(req: Request<{ id: string }>, res: Response) {
-        const { id } = req.params;
+    async delete(req: Request<{ id: number }>, res: Response) {
+        const id = Number(req.params.id);
 
         const deleted = taskService.delete(id);
 
