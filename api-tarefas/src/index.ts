@@ -1,14 +1,6 @@
-// src/index.ts
-import express from 'express';
-import router from './routes/router'
-const app = express();
-const PORTA = 3333;
 
-// Middleware "tradutor" de JSON (CRUCIAL)
-app.use(express.json()); 
+import { app } from './config/expressConfig';
 
-app.use(router)
-
-app.listen(PORTA, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORTA}`);
+app.listen(3030, () => {
+  console.log('🚀 Servidor rodando na porta 3030');
 });

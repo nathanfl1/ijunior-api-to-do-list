@@ -1,78 +1,76 @@
-interface Task {
-    id: string;
-    title: string;
-    completed: boolean;
-}
-
-let actualId = 1;
-const tasks: Task[] = []
+import { prisma } from "../config/prismaClient";
 
 export class TaskService {
 
-    getAll(completed?: string, title?: string): Task[] {
-        let result = tasks;
+    async getAll(completed?: string, title?: string) {
+        return await prisma.task.findMany({
+            where: {
+                completed:
+                    completed !== undefined
+                        ? completed === "true"
+                        : undefined,
 
-        if (completed !== undefined) {
-            const isCompleted = completed === "true";
-            result = result.filter(task => task.completed === isCompleted);
-        }
-
-        if (title !== undefined) {
-            result = result.filter(task =>
-                task.title.toLowerCase().includes(title.toLowerCase())
-            );
-        }
-
-        return result;
+                title:
+                    title
+                        ? {
+                            contains: title,
+                        }
+                        : undefined,
+            },
+        });
     }
 
-    getById(id: string): Task | undefined {
-        return tasks.find(task => task.id === id);
+    async getById(id: number) {
+        return await prisma.task.findUnique({
+            where: {
+                id
+            }
+        });
     }
 
-    create(title: string): Task {
-
-        const newTask: Task = {
-            id: actualId.toString(),
-            title,
-            completed: false
-        };
-        actualId++;
-        tasks.push(newTask);
-
-        return newTask;
+    async create(title: string) {
+        return await prisma.task.create({
+            data: {
+                title,
+                completed: false
+            }
+        });
     }
 
-    update(id: string, title?: string, completed?: boolean): Task | undefined {
 
-        const task = tasks.find(task => task.id === id);
+    async update(id: number, title?: string, completed?: boolean) {
+
+        const task = await prisma.task.findUnique({
+            where: { id }
+        });
 
         if (!task) {
             return undefined;
         }
 
-        if (title !== undefined) {
-            task.title = title;
-        }
-
-        if (completed !== undefined) {
-            task.completed = completed;
-        }
-
-        return task;
+        return await prisma.task.update({
+            where: { id },
+            data: {
+                title,
+                completed
+            }
+        });
     }
-    delete(id: string): boolean {
 
-        const index = tasks.findIndex(task => task.id === id);
+    async delete(id: number): Promise<boolean> {
 
-        if (index === -1) {
+        const task = await prisma.task.findUnique({
+            where: { id }
+        });
+
+        if (!task) {
             return false;
         }
 
-        tasks.splice(index, 1);
+        await prisma.task.delete({
+            where: { id }
+        });
 
         return true;
     }
-
 }
-
